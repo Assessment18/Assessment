@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplementary Calculator </title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #004f99; /* Official blue color */
+            padding: 20px 0;
+            text-align: center;
+            color: white;
+            font-size: 2.5em;
+            font-weight: 700;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        header img {
+            width: 150px; /* Adjust the size of the logo */
+            margin-bottom: 10px; /* Space between logo and text */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        input[type="number"], input[type="date"], select {
+            padding: 8px;
+            margin: 10px 0 20px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .print-button {
+            background-color: #007bff;
+            margin-top: 20px;
+        }
+        .print-button:hover {
+            background-color: #0056b3;
+        }
+        .print-button, button {
+            margin-right: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            background-color: #fff;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #004f99; /* Same blue as header */
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tfoot {
+            font-weight: bold;
+            background-color: #f1f1f1;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group div {
+            margin-bottom: 10px;
+        }
+        .old-av-group {
+            margin-bottom: 15px;
+        }
+        .old-av-period {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .old-av-period button {
+            margin-top: 10px;
+            background-color: #dc3545; /* Red for remove button */
+        }
+        .old-av-period button:hover {
+            background-color: #c82333;
+        }
+        .new-av-group {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .new-av-group div {
+            margin-bottom: 10px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: #343a40; /* Dark grey */
+            color: white;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container" align: center;>
+        
+    </div>
+    <header>
+        <span style="font-size: 1.2em; font-weight: 500;">Calculation of Supplementary Bill</span>
+    </header>
+
+    <div class="container">
+        <h2>Enter Property Details</h2>
+
+        <div class="form-group new-av-group">
+            <h3>New Assessed Value Details</h3>
+            <div>
+                <label for="newAV">New AV (₹):</label>
+                <input type="number" id="newAV" placeholder="Enter New Assessed Value" value="0">
+            </div>
+            <div>
+                <label for="currentWardType">Ward Type:</label>
+                <select id="currentWardType">
+                    <option value="gr">GR</option>
+                    <option value="nonGr">Non-GR</option>
+                </select>
+            </div>
+            <div>
+                <label for="currentPropertyType">Property Type:</label>
+                <select id="currentPropertyType">
+                    <option value="apartment">Apartment</option>
+                    <option value="nonApartment">Non-Apartment</option>
+                </select>
+            </div>
+            <div>
+                <label for="newStart">Effective Start Date:</label>
+                <input type="date" id="newStart">
+            </div>
+            <div>
+                <label for="newEnd">Effective End Date:</label>
+                <input type="date" id="newEnd">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div>
+                <label for="newAnnualSurcharge">New Annual Surcharge (₹):</label>
+                <input type="number" id="newAnnualSurcharge" placeholder="Enter New Annual Surcharge" value="0">
+            </div>
+            <div>
+                <label for="newSurchargeStart">New Surcharge Effective Start:</label>
+                <input type="date" id="newSurchargeStart">
+            </div>
+            <div>
+                <label for="newSurchargeEnd">New Surcharge Effective End:</label>
+                <input type="date" id="newSurchargeEnd">
+            </div>
+        </div>
+
+        <div class="form-group old-av-group">
+            <h4>Old AV Periods:</h4>
+            <div id="oldAVContainer"></div>
+            <button onclick="addOldAVPeriod()">Add Old AV Period</button>
+        </div>
+
+        <div class="form-group">
+            <div>
+                <label for="oldAnnualSurcharge">Old Annual Surcharge (₹):</label>
+                <input type="number" id="oldAnnualSurcharge" placeholder="Enter Old Annual Surcharge" value="0">
+            </div>
+            <div>
+                <label for="oldSurchargeStart">Old Surcharge Effective Start:</label>
+                <input type="date" id="oldSurchargeStart">
+            </div>
+            <div>
+                <label for="oldSurchargeEnd">Old Surcharge Effective End:</label>
+                <input type="date" id="oldSurchargeEnd">
+            </div>
+        </div>
+
+        <button onclick="generateTable()">Generate Tax Table</button>
+        <button class="print-button" onclick="window.print()">Print Table</button>
+        <button onclick="exportToExcel()">Export to Excel</button>
+        <button onclick="exportToPDF()">Export to PDF</button>
+
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th>FY</th><th>Qtr</th><th>Old AV</th><th>New AV</th>
+                    <th>Old Prop Tax</th><th>HB Old</th><th>Old SC/Qtr</th>
+                    <th>New Prop Tax</th><th>HB New</th><th>New SC/Qtr</th>
+                    <th>Diff PT</th><th>Diff HB</th><th>Diff SC</th><th>Total Diff</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot id="totalRow"></tfoot>
+        </table>
+
+        <div style="margin-top: 30px; font-size: 0.9em; color: #777;">
+            <p>
+                <strong>Note:</strong> The calculated values in the table provide an estimate for the supplementary bill. Minor discrepancies might occur due to rounding during the official assessment process. </p>
+        
+            </p>
+        </div>
+        <footer class="footer">
+            <p>&copy; This Supplementary Calculator has been developed by <strong>Dipanjan Chatterjee</strong>. </p>
+        </footer>
+    </div>
+
+    <script>
+        function addOldAVPeriod() {
+            const container = document.getElementById('oldAVContainer');
+            const div = document.createElement('div');
+            div.classList.add('old-av-period');
+            div.innerHTML = `
+                <label for="oldAV">Old AV (₹):</label>
+                <input type="number" class="oldAV" placeholder="Enter Old Assessed Value" value="0"><br>
+                <label for="oldStart">Start Date:</label>
+                <input type="date" class="oldStart"><br>
+                <label for="oldEnd">End Date:</label>
+                <input type="date" class="oldEnd"><br>
+                <label for="oldWardType">Ward Type (Old):</label>
+                <select class="oldWardType">
+                    <option value="gr">GR</option>
+                    <option value="nonGr">Non-GR</option>
+                </select><br>
+                <label for="oldPropertyType">Property Type (Old):</label>
+                <select class="oldPropertyType">
+                    <option value="apartment">Apartment</option>
+                    <option value="nonApartment">Non-Apartment</option>
+                </select><br>
+                <button onclick="removeOldAVPeriod(this)">Remove Period</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeOldAVPeriod(button) {
+            const container = document.getElementById('oldAVContainer');
+            container.removeChild(button.parentNode);
+        }
+
+        function getFinancialYear(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1; // Month is 0-indexed
+            if (month >= 4) {
+                return `${year}-${year + 1}`;
+            } else {
+                return `${year - 1}-${year}`;
+            }
+        }
+
+        function getQuarter(date) {
+            const month = date.getMonth() + 1; // Month is 0-indexed
+            const day = date.getDate();
+            if ((month === 4 && day >= 1) || (month === 5) || (month === 6 && day <= 30)) return 1;  // Q1: April 1 - June 30
+            if ((month === 7 && day >= 1) || (month === 8) || (month === 9 && day <= 30)) return 2;  // Q2: July 1 - September 30
+            if ((month === 10 && day >= 1) || (month === 11) || (month === 12 && day <= 31)) return 3; // Q3: October 1 - December 31
+            return 4;                                                                                // Q4: January 1 - March 31
+        }
+
+        function generateTable() {
+            const newAV = parseFloat(document.getElementById('newAV').value);
+            const newStart = new Date(document.getElementById('newStart').value);
+            const newEnd = new Date(document.getElementById('newEnd').value);
+            const newAnnualSurcharge = parseFloat(document.getElementById('newAnnualSurcharge').value);
+            const newSurchargeStart = new Date(document.getElementById('newSurchargeStart').value);
+            const newSurchargeEnd = new Date(document.getElementById('newSurchargeEnd').value);
+            const currentWardType = document.getElementById('currentWardType').value;
+            const currentPropertyType = document.getElementById('currentPropertyType').value;
+            const oldAnnualSurcharge = parseFloat(document.getElementById('oldAnnualSurcharge').value);
+            const oldSurchargeStart = new Date(document.getElementById('oldSurchargeStart').value);
+            const oldSurchargeEnd = new Date(document.getElementById('oldSurchargeEnd').value);
+
+            const oldAVPeriods = [];
+            const oldAVPeriodDivs = document.querySelectorAll('#oldAVContainer .old-av-period');
+
+            oldAVPeriodDivs.forEach(div => {
+                const avInput = div.querySelector('.oldAV');
+                const startInput = div.querySelector('.oldStart');
+                const endInput = div.querySelector('.oldEnd');
+                const wardSelect = div.querySelector('.oldWardType');
+                const propertySelect = div.querySelector('.oldPropertyType');
+
+                if (avInput && startInput && endInput && wardSelect && propertySelect) {
+                    oldAVPeriods.push({
+                        av: parseFloat(avInput.value),
+                        start: new Date(startInput.value),
+                        end: new Date(endInput.value),
+                        wardType: wardSelect.value,
+                        propertyType: propertySelect.value
+                    });
+                }
+            });
+
+            const tbody = document.querySelector('#resultTable tbody');
+            tbody.innerHTML = ''; // Clear previous results
+            const tfoot = document.getElementById('totalRow');
+            tfoot.innerHTML = '';
+
+            let totalDiffPT = 0;
+            let totalDiffHB = 0;
+            let totalDiffSC = 0;
+
+            // Function to calculate property tax (Quarterly)
+            function calculatePropertyTax(av, ward, type) {
+                let tax = 0;
+                if (type === "apartment") {
+                    tax = ward === "gr" ? Math.ceil(av * 0.3) : Math.ceil(av * 0.4);
+                } else {
+                    if (ward === "gr") {
+                        if (av <= 999) tax = Math.ceil(av * ((10 + av / 100) / 100));
+                        else if (av <= 9999) tax = Math.ceil(av * ((20 + av / 1000) / 100));
+                        else tax = Math.ceil(av * 0.3);
+                    } else {
+                        if (av <= 999) tax = Math.ceil(av * ((10 + av / 100) / 100));
+                        else if (av <= 17999) tax = Math.ceil(av * ((22 + av / 1000) / 100));
+                        else tax = Math.ceil(av * 0.4);
+                    }
+                }
+                return tax / 4; // Divide annual tax by 4 for quarterly tax
+            }
+
+            // Function to calculate quarterly surcharge
+            function calculateQuarterlySurcharge(annualSurcharge) {
+                return annualSurcharge / 4;
+            }
+
+            let currentDate = new Date(newStart);
+            while (currentDate <= newEnd) {
+                const fy = getFinancialYear(currentDate);
+                const qtr = getQuarter(currentDate);
+                const firstDayOfQuarter = new Date(currentDate.getFullYear(), (qtr - 1) * 3, 1);
+                let lastDayOfQuarter;
+                if (qtr === 1) lastDayOfQuarter = new Date(currentDate.getFullYear(), 5, 30);   // June 30
+                else if (qtr === 2) lastDayOfQuarter = new Date(currentDate.getFullYear(), 8, 30);   // September 30
+                else if (qtr === 3) lastDayOfQuarter = new Date(currentDate.getFullYear(), 11, 31);  // December 31
+                else lastDayOfQuarter= new Date(currentDate.getFullYear(), 2, 31);    // March 31
+
+                let applicableOldAV = 0;
+                let applicableOldWardType = currentWardType; // Default
+                let applicableOldPropertyType = currentPropertyType; // Default
+
+                for (const period of oldAVPeriods) {
+                    const periodStart = new Date(period.start);
+                    const periodEnd = new Date(period.end);
+
+                    if ((firstDayOfQuarter >= periodStart && lastDayOfQuarter <= periodEnd) ||
+                        (firstDayOfQuarter <= periodEnd && lastDayOfQuarter >= periodStart)) {
+                        applicableOldAV = period.av;
+                        applicableOldWardType = period.wardType;
+                        applicableOldPropertyType = period.propertyType;
+                        break; // Apply the first overlapping old AV period
+                    }
+                }
+
+                const oldPropTax = Math.ceil(calculatePropertyTax(applicableOldAV, applicableOldWardType, applicableOldPropertyType));
+                const newPropTax = Math.ceil(calculatePropertyTax(newAV, currentWardType, currentPropertyType));
+
+                // Calculate Howrah Bridge Tax
+                const annualHBOld = applicableOldAV * 0.0025; // 0.25% of AV
+                const hbOld = Math.max(1, Math.ceil(annualHBOld / 4)); // Quarterly, min 1
+
+                const annualHBNew = newAV * 0.0025;
+                const hbNew = Math.max(1, Math.ceil(annualHBNew / 4));
+
+                const oldSCQuarter = Math.ceil(calculateQuarterlySurcharge(oldAnnualSurcharge));
+                const newSCQuarter = Math.ceil(calculateQuarterlySurcharge(newAnnualSurcharge));
+
+                const diffPT = newPropTax - oldPropTax;
+                const diffHB = hbNew - hbOld;
+                const diffSC = newSCQuarter - oldSCQuarter;
+                const totalDiff = diffPT + diffHB + diffSC;
+
+                const row = tbody.insertRow();
+                row.insertCell().textContent = fy;
+                row.insertCell().textContent = `Q${qtr}`;
+                row.insertCell().textContent = Math.ceil(applicableOldAV).toFixed(0);
+                row.insertCell().textContent = Math.ceil(newAV).toFixed(0);
+                row.insertCell().textContent = oldPropTax.toFixed(0);
+                row.insertCell().textContent = hbOld.toFixed(0);
+                row.insertCell().textContent = oldSCQuarter.toFixed(0);
+                row.insertCell().textContent = newPropTax.toFixed(0);
+                row.insertCell().textContent = hbNew.toFixed(0);
+                row.insertCell().textContent = newSCQuarter.toFixed(0);
+                row.insertCell().textContent = diffPT.toFixed(0);
+                row.insertCell().textContent = diffHB.toFixed(0);
+                row.insertCell().textContent = diffSC.toFixed(0);
+                row.insertCell().textContent = Math.ceil(totalDiff).toFixed(0);
+
+                totalDiffPT += diffPT;
+                totalDiffHB += diffHB;
+                totalDiffSC += diffSC;
+
+                // Move to the next quarter
+                currentDate.setMonth(currentDate.getMonth() + 3);
+            }
+
+            const footerRow = tfoot.insertRow();
+            footerRow.insertCell().textContent = '';
+            footerRow.insertCell().textContent = 'Total:';
+            footerRow.insertCell(); // Old AV
+            footerRow.insertCell(); // New AV
+            footerRow.insertCell().textContent = Math.ceil(totalDiffPT).toFixed(0);
+            footerRow.insertCell().textContent = Math.ceil(totalDiffHB).toFixed(0);
+            footerRow.insertCell().textContent = Math.ceil(totalDiffSC).toFixed(0);
+            footerRow.insertCell(); // New Prop Tax
+            footerRow.insertCell(); // HB New
+            footerRow.insertCell(); // New SC/Qtr
+            footerRow.insertCell().textContent = Math.ceil(totalDiffPT).toFixed(0);
+            footerRow.insertCell().textContent = Math.ceil(totalDiffHB).toFixed(0);
+            footerRow.insertCell().textContent = Math.ceil(totalDiffSC).toFixed(0);
+            footerRow.insertCell().textContent = Math.ceil(totalDiffPT + totalDiffHB + totalDiffSC).toFixed(0);
+        }
+
+        function exportToExcel() {
+            // Implement Excel export using a library like SheetJS (xlsx)
+            alert('Excel export functionality will be implemented here.');
+        }
+
+        function exportToPDF() {
+            // Implement PDF export using a library like jsPDF
+            alert('PDF export functionality will be implemented here.');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proportionate Arrear Tax Calculator</title>
+    <style>
+        /* Your original CSS (no changes here for screen layout unless specified) */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f8fa; /* Very light blue-grey */
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: #f4f8fa; /* Very light blue-grey */
+            color: #007bff; /* Vibrant blue */
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .header img {
+            max-height: 250px;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 500;
+        }
+
+        .calculator-layout {
+            display: grid;
+            grid-template-columns: 1fr; /* Stack on smaller screens */
+            gap: 30px;
+            max-width: 1260px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (min-width: 768px) {
+            .calculator-layout {
+                /* Adjusted for narrower input (30%) and wider output (70%) */
+                grid-template-columns: 30% 70%;
+            }
+        }
+
+        #input-panel {
+            padding: 25px;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+        }
+
+        #input-panel h2 {
+            color: #007bff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"] {
+            width: calc(100% - 16px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        button {
+            background-color: #28a745; /* Success green */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #1e7e34;
+        }
+
+        #output-area > section {
+            padding: 25px;
+            border-radius: 6px;
+            background-color: #e9ecef; /* Light grey background for output */
+        }
+
+        #output-area h2,
+        #output-area h3 {
+            color: #28a745;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        #output-area h3 {
+            font-size: 1.5em; /* Adjusted for better hierarchy */
+        }
+
+
+        /* Removed .output-item styles as they are no longer used for the summary table */
+
+        #demandLetter,
+        #calculation-result {
+            display: none; /* Initially hidden on screen, revealed by JS */
+        }
+
+        /* Make the summary table visible by default on screen */
+        #summary-table { /* Renamed from #print-summary-table */
+            display: table; /* Visible on screen */
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 25px;
+        }
+
+        #summary-table th,
+        #summary-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top; /* Align content to top */
+        }
+
+        #summary-table th {
+            background-color: #f2f2f2;
+        }
+
+        /* Hide the 'DETAILS' rows by default on screen */
+        #summary-table .details-row {
+            display: none;
+        }
+
+        /* Make the total row distinct */
+        #summary-table .total-row td {
+            font-weight: bold;
+            background-color: #e9ecef;
+            font-size: 1.1em;
+        }
+
+        /* Adjust column widths for better multi-column layout */
+        #summary-table td:nth-child(odd),
+        #summary-table th:nth-child(odd) { /* Labels */
+            width: 40%; /* Adjust as needed */
+        }
+        #summary-table td:nth-child(even),
+        #summary-table th:nth-child(even) { /* Values */
+            width: 60%; /* Adjust as needed */
+        }
+
+
+        #demandLetter p {
+            line-height: 1.7;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .print-button-container {
+            text-align: right;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .print-button-container button {
+            background-color: #6c757d; /* Secondary grey */
+        }
+
+        .print-button-container button:hover {
+            background-color: #5a6268;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: #343a40; /* Dark grey */
+            color: white;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.9em;
+        }
+
+        /* --- Print styles --- */
+        @media print {
+            body {
+                background-color: white;
+                color: black;
+                font-size: 12pt;
+                line-height: 1.4;
+                margin: 1cm;
+            }
+
+            .header {
+                box-shadow: none;
+                background-color: transparent;
+                color: #333;
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+
+            .print-button-container {
+                display: none !important;
+            }
+
+            #calculator-content {
+                display: block !important;
+            }
+
+            #input-panel {
+                display: block !important;
+                border: 1px solid #000;
+                padding: 1.5cm;
+                margin-bottom: 1.5cm;
+                box-shadow: none;
+                background-color: #fff;
+                page-break-after: avoid;
+            }
+
+            #input-panel label,
+            #input-panel input {
+                color: black;
+                display: block;
+                margin-bottom: 0.5cm;
+            }
+
+            #input-panel input {
+                border: 1px solid #ddd;
+                padding: 5px;
+                width: 95%;
+                background-color: #f0f0f0;
+            }
+
+            #input-panel button {
+                display: none !important;
+            }
+
+            #output-area > section {
+                display: block !important;
+                border: 1px solid #000;
+                padding: 1.5cm;
+                margin-bottom: 1.5cm;
+                box-shadow: none;
+                page-break-before: avoid;
+                page-break-after: avoid;
+            }
+
+            #calculation-result {
+                display: block !important; /* Ensure the section is visible in print */
+            }
+
+            /* Ensure summary table is displayed as table in print */
+            #summary-table {
+                display: table !important;
+            }
+
+            /* Hide the 'DETAILS' rows in print as well */
+            #summary-table .details-row {
+                display: none !important;
+            }
+
+            #demandLetter {
+                page-break-inside: avoid;
+            }
+
+            .output-label { /* Keep this if you re-introduce list items in print, otherwise it's redundant */
+                font-weight: bold;
+                width: auto;
+                display: inline-block;
+                margin-right: 1cm;
+            }
+
+            /* Keep .output-item as block for the demand letter's list items */
+            /* This targets the <ul><li> elements inside demandLetter */
+            #demandLetter ul li {
+                display: list-item; /* Explicitly ensure list items are list items in print */
+                margin-bottom: 0.5cm;
+            }
+
+
+            h2,
+            h3 {
+                color: black !important;
+                page-break-after: avoid;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+
+            .footer {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="calculator-content">
+        <div class="header">
+            
+            <h1>Proportionate Arrear Property Tax Calculator</h1>
+        </div>
+
+        <main class="calculator-layout">
+            <aside id="input-panel">
+                <h2>Enter Details</h2>
+                <form id="taxForm">
+                    <label for="applicationNumber">Application Number:</label>
+                    <input type="text" id="applicationNumber" required />
+
+                    <label for="applicantName">Applicant Name:</label>
+                    <input type="text" id="applicantName" required />
+
+                    <label for="proposedHoldingNumber">Proposed Holding Number:</label>
+                    <input type="text" id="proposedHoldingNumber" required />
+
+                    <label for="assesseeNumber">Mother Assessee Number:</label>
+                    <input type="text" id="assesseeNumber" required />
+
+                    <label for="motherHoldingNumber">Mother Holding Number:</label>
+                    <input type="text" id="motherHoldingNumber" required />
+
+                    <label for="streetName">Street Name:</label>
+                    <input type="text" id="streetName" required />
+
+                    <label for="wardNumber">Ward Number:</label>
+                    <input type="text" id="wardNumber" required />
+
+                    <label for="arrearDate">Outstanding Arrear as on (dd-mm-yyyy):</label>
+                    <input type="date" id="arrearDate" required />
+
+                    <label for="motherAnnualValuation">Mother Holding AV (₹):</label>
+                    <input type="number" id="motherAnnualValuation" required />
+
+                    <label for="proposedAnnualValuation">Proposed Holding AV (₹):</label>
+                    <input type="number" id="proposedAnnualValuation" required />
+
+                    <hr> <h3>Breakdown of Mother Holding Arrears</h3>
+                    <label for="propertyTax">Property Tax Due (₹):</label>
+                    <input type="number" id="propertyTax" value="0" required />
+
+                    <label for="howrahBridgeTax">Howrah Bridge Tax Due (₹):</label>
+                    <input type="number" id="howrahBridgeTax" value="0" required />
+
+                    <label for="surcharge">Surcharge Due (₹):</label>
+                    <input type="number" id="surcharge" value="0" required />
+
+                    <label for="interest">Interest Due (₹):</label>
+                    <input type="number" id="interest" value="0" required />
+
+                    <label for="penalty">Penalty Due (₹):</label>
+                    <input type="number" id="penalty" value="0" required />
+
+                    <button type="button" onclick="calculateProportionalValue()">Calculate</button>
+                </form>
+            </aside>
+
+            <article id="output-area">
+                <section id="calculation-result">
+                    <h2>Calculated Proportionate Arrear Property Tax Summary</h2>
+                    <table id="summary-table">
+                        <thead>
+                            <tr class="details-row"> <th colspan="2" style="text-align: center; background-color: #cfe2ff; color: #007bff;">DETAILS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="details-row"> <td><strong>Application No.:</strong></td>
+                                <td id="summary-app-no"></td>
+                            </tr>
+                            <tr class="details-row"> <td><strong>Applicant Name:</strong></td>
+                                <td id="summary-applicant-name"></td>
+                            </tr>
+                            <tr class="details-row"> <td><strong>Proposed Holding No.:</strong></td>
+                                <td id="summary-prop-holding-no"></td>
+                            </tr>
+                            <tr class="details-row"> <td><strong>Mother Assessee No.:</strong></td>
+                                <td id="summary-assessee-no"></td>
+                            </tr>
+                             <tr class="details-row"> <td><strong>Mother Holding No.:</strong></td>
+                                <td id="summary-mother-holding-no"></td>
+                            </tr>
+                            <tr class="details-row"> <td><strong>Street Name:</strong></td>
+                                <td id="summary-street-name"></td>
+                            </tr>
+                            <tr class="details-row"> <td><strong>Ward No.:</strong></td>
+                                <td id="summary-ward-no"></td>
+                            </tr>
+                            <tr class="details-row"> <td><strong>Outstanding Arrear as on:</strong></td>
+                                <td id="summary-arrear-date"></td>
+                            </tr>
+                            <tr class="details-row"> <td><strong>Mother Holding AV:</strong></td>
+                                <td>₹<span id="summary-mother-av"></span></td>
+                            </tr>
+                            <tr class="details-row"> <td><strong>Proposed Holding AV:</strong></td>
+                                <td>₹<span id="summary-proposed-av"></span></td>
+                            </tr>
+                             <tr>
+                                <th colspan="2" style="text-align: center; background-color: #d1e7dd; color: #28a745;">PROPORTIONATE ARREARS BREAKDOWN</th>
+                            </tr>
+                             <tr>
+                                <td><strong>Proportionate Property Tax:</strong></td>
+                                <td>₹<span id="summary-prop-property-tax"></span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Proportionate Howrah Bridge Tax:</strong></td>
+                                <td>₹<span id="summary-prop-hbt"></span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Proportionate Surcharge:</strong></td>
+                                <td>₹<span id="summary-prop-surcharge"></span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Proportionate Interest:</strong></td>
+                                <td>₹<span id="summary-prop-interest"></span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Proportionate Penalty:</strong></td>
+                                <td>₹<span id="summary-prop-penalty"></span></td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>TOTAL AMOUNT DUE:</strong></td>
+                                <td>₹<span id="summary-total-calc"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section id="demandLetter">
+                    <h3>Proportionate Arrear Property Tax Demand Letter</h3>
+                    <p> Applicant: <strong><span id="out-title"></span>,</strong></p>
+                    <p> <strong> Subject: Demand for Proportionate Arrear Amount of Property Tax for Mutation Application <span id="out-app3"></span> </strong></p>
+                    <p>Sir/Madam <strong> <span id="out-title2"></span></strong>,</p>
+                    <p>This letter is to inform you that in order to finalize the mutation process for your mutation application number <strong> <span id="out-app4"> </span> </strong>, by applicant <strong> <span id="demand-name"> </span> </strong> for proposed holding number <strong> <span id="demand-prop-holding"> </span> </strong>, it is necessary to clear the proportionate arrear amount of property tax outstanding on the said property as on <strong> <span id="arrear-date-demand"></span> </strong>.</p>
+                    <p>The Mother Assessee Number is: <strong> <span id="assessee-no-demand"></span> </strong></p>
+                    <p>The Mother Holding Number is: <strong> <span id="mother-holding-demand"></span> </strong>, located at <strong> <span id="street-demand"></span></strong>, Ward Number: <strong> <span id="ward-demand"></span></strong>.</p>
+                    <p>The **Proportionate Arrears** for the proposed holding are calculated as follows:</p>
+                    <ul>
+                        <li>Property Tax: ₹<span id="demand-prop-tax"></span></li>
+                        <li>Howrah Bridge Tax: ₹<span id="demand-prop-hbt"></span></li>
+                        <li>Surcharge: ₹<span id="demand-prop-surcharge"></span></li>
+                        <li>Interest: ₹<span id="demand-prop-interest"></span></li>
+                        <li>Penalty: ₹<span id="demand-prop-penalty"></span></li>
+                    </ul>
+                    <p>The **total amount payable** is <strong> ₹<span id="out-calc2"></span> (Rupees <span id="out-calc-words"></span> Only) </strong>. We request you to remit this amount within 15 days from the date of generation of this letter.</p>
+                   
+                    <p> <strong> Failure to pay will result in withholding of the mutation process. </strong> </p>
+                    
+                   
+                    <p style="font-style: italic; margin-top: 20px;">**This is a computer-generated statement.**</p>
+                </section>
+
+                <div class="print-button-container">
+                    <button onclick="window.print()">Print</button>
+                </div>
+            </article>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; This Proportionate Arrear Tax Calculator has been developed by <strong>Dipanjan Chatterjee</strong>. </p>
+        </footer>
+    </div>
+
+    <script>
+        function calculateProportionalValue() {
+            const appNo = document.getElementById("applicationNumber").value;
+            const name = document.getElementById("applicantName").value;
+            const proposedHoldingNumber = document.getElementById("proposedHoldingNumber").value;
+            const assesseeNumber = document.getElementById("assesseeNumber").value;
+            const motherHoldingNumber = document.getElementById("motherHoldingNumber").value;
+            const streetName = document.getElementById("streetName").value;
+            const wardNumber = document.getElementById("wardNumber").value;
+            const arrearDate = document.getElementById("arrearDate").value; //YYYY-MM-DD format from input type="date"
+            const motherAV = parseFloat(document.getElementById("motherAnnualValuation").value);
+            const proposedAV = parseFloat(document.getElementById("proposedAnnualValuation").value);
+
+            // New inputs for individual tax components
+            const propertyTax = parseFloat(document.getElementById("propertyTax").value);
+            const howrahBridgeTax = parseFloat(document.getElementById("howrahBridgeTax").value);
+            const surcharge = parseFloat(document.getElementById("surcharge").value);
+            const interest = parseFloat(document.getElementById("interest").value);
+            const penalty = parseFloat(document.getElementById("penalty").value);
+
+            // Input validation
+            if (motherAV <= 0 || isNaN(motherAV) || isNaN(proposedAV) || isNaN(propertyTax) || isNaN(howrahBridgeTax) || isNaN(surcharge) || isNaN(interest) || isNaN(penalty)) {
+                alert("Please enter valid numeric values for all tax components and AVs. Mother Holding AV must be a positive number.");
+                return;
+            }
+            if (proposedAV < 0 || propertyTax < 0 || howrahBridgeTax < 0 || surcharge < 0 || interest < 0 || penalty < 0) {
+                alert("Tax amounts and Proposed Holding AV cannot be negative. Please enter valid amounts.");
+                return;
+            }
+
+
+            // --- Core Proportionate Calculation ---
+            const proportionFactor = proposedAV / motherAV;
+
+            const proportionatePropertyTax = Math.ceil(propertyTax * proportionFactor);
+            const proportionateHowrahBridgeTax = Math.ceil(howrahBridgeTax * proportionFactor);
+            const proportionateSurcharge = Math.ceil(surcharge * proportionFactor);
+            const proportionateInterest = Math.ceil(interest * proportionFactor);
+            const proportionatePenalty = Math.ceil(penalty * proportionFactor);
+
+            const totalProportionateAmount = proportionatePropertyTax + proportionateHowrahBridgeTax + proportionateSurcharge + proportionateInterest + proportionatePenalty;
+
+            const formattedTotal = totalProportionateAmount.toFixed(0);
+            const words = convertNumberToWords(totalProportionateAmount);
+
+            // Format arrear date for display (DD-MM-YYYY)
+            let formattedArrearDate = arrearDate;
+            try {
+                const dateParts = arrearDate.split('-'); //YYYY-MM-DD
+                if (dateParts.length === 3) {
+                    formattedArrearDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+                }
+            } catch (e) {
+                console.error("Error formatting date:", e);
+            }
+
+            // --- Populate the Demand Letter Section (unchanged) ---
+            document.getElementById("out-app3").textContent = appNo;
+            document.getElementById("out-app4").textContent = appNo;
+            document.getElementById("out-title").textContent = name;
+            document.getElementById("out-title2").textContent = name;
+            document.getElementById("demand-name").textContent = name;
+            document.getElementById("demand-prop-holding").textContent = proposedHoldingNumber;
+            document.getElementById("arrear-date-demand").textContent = formattedArrearDate; // Use formatted date
+            document.getElementById("assessee-no-demand").textContent = assesseeNumber;
+            document.getElementById("mother-holding-demand").textContent = motherHoldingNumber;
+            document.getElementById("street-demand").textContent = streetName;
+            document.getElementById("ward-demand").textContent = wardNumber;
+
+            // Individual proportionate values for demand letter (using toFixed(2) as originally specified)
+            document.getElementById("demand-prop-tax").textContent = proportionatePropertyTax.toFixed(2);
+            document.getElementById("demand-prop-hbt").textContent = proportionateHowrahBridgeTax.toFixed(2);
+            document.getElementById("demand-prop-surcharge").textContent = proportionateSurcharge.toFixed(2);
+            document.getElementById("demand-prop-interest").textContent = proportionateInterest.toFixed(2);
+            document.getElementById("demand-prop-penalty").textContent = proportionatePenalty.toFixed(2);
+
+            document.getElementById("out-calc2").textContent = formattedTotal;
+            document.getElementById("out-calc-words").textContent = words;
+
+
+            // --- Populate the Proportionate Arrears Breakdown in the Summary Table ---
+            document.getElementById("summary-prop-property-tax").textContent = proportionatePropertyTax.toFixed(0);
+            document.getElementById("summary-prop-hbt").textContent = proportionateHowrahBridgeTax.toFixed(0);
+            document.getElementById("summary-prop-surcharge").textContent = proportionateSurcharge.toFixed(0);
+            document.getElementById("summary-prop-interest").textContent = proportionateInterest.toFixed(0);
+            document.getElementById("summary-prop-penalty").textContent = proportionatePenalty.toFixed(0);
+            document.getElementById("summary-total-calc").textContent = formattedTotal;
+
+            // Display results sections
+            document.getElementById("calculation-result").style.display = "block";
+            document.getElementById("demandLetter").style.display = "block";
+            document.querySelector('.print-button-container').style.display = "block";
+        }
+
+        function convertNumberToWords(n) {
+            const a = [
+                "", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+                "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen",
+                "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+            ];
+            const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+            if ((n = n.toString()).length > 9) return "Overflow";
+            let num = ("000000000" + n).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+            if (!num) return; let str = "";
+            str += (num[1] != 0) ? (a[Number(num[1])] || b[num[1][0]] + " " + a[num[1][1]]) + " Crore " : "";
+            str += (num[2]!= 0) ? (a[Number(num[2])] || b[num[2][0]] + " " + a[num[2][1]]) + " Lakh " : "";
+            str += (num[3] != 0) ? (a[Number(num[3])] || b[num[3][0]] + " " + a[num[3][1]]) + " Thousand " : "";
+            str += (num[4] != 0) ? (a[Number(num[4])] || b[num[4][0]] + " " + a[num[4][1]]) + " Hundred " : "";
+            str += (num[5] != 0) ? ((str !== "") ? "and " : "") + (a[Number(num[5])] || b[num[5][0]] + " " + a[num[5][1]]) + " " : "";
+            return str.trim();
+        }
+    </script>
+</body>
+</html>

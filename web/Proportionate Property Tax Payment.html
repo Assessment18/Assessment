@@ -88,6 +88,14 @@
             font-size: 1em;
         }
 
+        /* Style for the readonly total outstanding field */
+        input[type="number"][readonly] {
+            background-color: #e9ecef; /* Light grey to indicate it's not editable */
+            font-weight: bold;
+            color: #333;
+        }
+
+
         button {
             background-color: #28a745; /* Success green */
             color: white;
@@ -320,7 +328,7 @@
     <div id="calculator-content">
         <div class="header">
             <img src="https://pt.myhmc.in/templates/default/img11/howrahlogo1.png" alt="Howrah Municipal Corporation Logo">
-            <h1>Proportionate Arrear Property Tax Calculator</h1>
+            <h1>Proportionate Arrear Property Tax Proposal Letter</h1>
         </div>
 
         <main class="calculator-layout">
@@ -367,11 +375,14 @@
                     <label for="surcharge">Surcharge Due (₹):</label>
                     <input type="number" id="surcharge" value="0" required />
 
-                    <label for="interest">Interest Due (₹):</label>
+                    <label for="interest">Interest Due / Rebate (₹):</label>
                     <input type="number" id="interest" value="0" required />
 
                     <label for="penalty">Penalty Due (₹):</label>
                     <input type="number" id="penalty" value="0" required />
+
+                    <label for="totalOutstanding">Total Outstanding (₹):</label>
+                    <input type="number" id="totalOutstanding" value="0" readonly />
 
                     <button type="button" onclick="calculateProportionalValue()">Calculate</button>
                 </form>
@@ -432,12 +443,8 @@
                                 <td>₹<span id="summary-prop-surcharge"></span></td>
                             </tr>
                             <tr>
-                                <td><strong>Proportionate Interest:</strong></td>
-                                <td>₹<span id="summary-prop-interest"></span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Proportionate Penalty:</strong></td>
-                                <td>₹<span id="summary-prop-penalty"></span></td>
+                                <td><strong>Proportionate Interest & Penalty:</strong></td>
+                                <td>₹<span id="summary-prop-interest-penalty"></span></td>
                             </tr>
                             <tr class="total-row">
                                 <td><strong>TOTAL AMOUNT DUE:</strong></td>
@@ -455,15 +462,13 @@
                     <p>This letter is to inform you that in order to finalize the mutation process for your mutation application number <strong> <span id="out-app4"> </span> </strong>, by applicant <strong> <span id="demand-name"> </span> </strong> for proposed holding number <strong> <span id="demand-prop-holding"> </span> </strong>, it is necessary to clear the proportionate arrear amount of property tax outstanding on the said property as on <strong> <span id="arrear-date-demand"></span> </strong>.</p>
                     <p>The Mother Assessee Number is: <strong> <span id="assessee-no-demand"></span> </strong></p>
                     <p>The Mother Holding Number is: <strong> <span id="mother-holding-demand"></span> </strong>, located at <strong> <span id="street-demand"></span></strong>, Ward Number: <strong> <span id="ward-demand"></span></strong>.</p>
-                    <p>The **Proportionate Arrears** for the proposed holding are calculated as follows:</p>
+                    <p>The <strong>Proportionate Arrears</strong> for the proposed holding are calculated as follows:</p>
                     <ul>
                         <li>Property Tax: ₹<span id="demand-prop-tax"></span></li>
                         <li>Howrah Bridge Tax: ₹<span id="demand-prop-hbt"></span></li>
                         <li>Surcharge: ₹<span id="demand-prop-surcharge"></span></li>
-                        <li>Interest: ₹<span id="demand-prop-interest"></span></li>
-                        <li>Penalty: ₹<span id="demand-prop-penalty"></span></li>
-                    </ul>
-                    <p>The **total amount payable** is <strong> ₹<span id="out-calc2"></span> (Rupees <span id="out-calc-words"></span> Only) </strong>. We request you to remit this amount within 15 days from the date of generation of this letter.</p>
+                        <li id="demand-interest-penalty-line"></li> </ul>
+                    <p>The <strong>total amount payable</strong> is <strong> ₹<span id="out-calc2"></span> (Rupees <span id="out-calc-words"></span> Only) </strong>. We request you to remit this amount within 15 days from the date of generation of this letter.</p>
                     <p>Payment can be made through the Collection Department, Howrah Municipal Corporation.</p>
                     <p> <strong> Failure to pay will result in withholding of the mutation process. </strong> </p>
                     <p>For any queries, contact or visit the Assessment & Collection Department during office hours.</p>
@@ -483,6 +488,31 @@
     </div>
 
     <script>
+        // Function to update the Total Outstanding field
+        function updateTotalOutstanding() {
+            const propertyTax = parseFloat(document.getElementById("propertyTax").value) || 0;
+            const howrahBridgeTax = parseFloat(document.getElementById("howrahBridgeTax").value) || 0;
+            const surcharge = parseFloat(document.getElementById("surcharge").value) || 0;
+            const interest = parseFloat(document.getElementById("interest").value) || 0;
+            const penalty = parseFloat(document.getElementById("penalty").value) || 0;
+
+            const total = propertyTax + howrahBridgeTax + surcharge + interest + penalty;
+            document.getElementById("totalOutstanding").value = total.toFixed(2); // Display with 2 decimal places
+        }
+
+        // Add event listeners to the relevant input fields
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById("propertyTax").addEventListener('input', updateTotalOutstanding);
+            document.getElementById("howrahBridgeTax").addEventListener('input', updateTotalOutstanding);
+            document.getElementById("surcharge").addEventListener('input', updateTotalOutstanding);
+            document.getElementById("interest").addEventListener('input', updateTotalOutstanding);
+            document.getElementById("penalty").addEventListener('input', updateTotalOutstanding);
+
+            // Call it once on load to populate if there are default values
+            updateTotalOutstanding();
+        });
+
+
         function calculateProportionalValue() {
             const appNo = document.getElementById("applicationNumber").value;
             const name = document.getElementById("applicantName").value;
@@ -495,34 +525,57 @@
             const motherAV = parseFloat(document.getElementById("motherAnnualValuation").value);
             const proposedAV = parseFloat(document.getElementById("proposedAnnualValuation").value);
 
-            // New inputs for individual tax components
-            const propertyTax = parseFloat(document.getElementById("propertyTax").value);
-            const howrahBridgeTax = parseFloat(document.getElementById("howrahBridgeTax").value);
-            const surcharge = parseFloat(document.getElementById("surcharge").value);
-            const interest = parseFloat(document.getElementById("interest").value);
-            const penalty = parseFloat(document.getElementById("penalty").value);
+            // Get individual tax components for the Mother Holding
+            const propertyTax = parseFloat(document.getElementById("propertyTax").value) || 0;
+            const howrahBridgeTax = parseFloat(document.getElementById("howrahBridgeTax").value) || 0;
+            const surcharge = parseFloat(document.getElementById("surcharge").value) || 0;
+            const interest = parseFloat(document.getElementById("interest").value) || 0; // Can be negative for rebate
+            const penalty = parseFloat(document.getElementById("penalty").value) || 0;
 
             // Input validation
-            if (motherAV <= 0 || isNaN(motherAV) || isNaN(proposedAV) || isNaN(propertyTax) || isNaN(howrahBridgeTax) || isNaN(surcharge) || isNaN(interest) || isNaN(penalty)) {
-                alert("Please enter valid numeric values for all tax components and AVs. Mother Holding AV must be a positive number.");
+            if (motherAV <= 0 || isNaN(motherAV) || isNaN(proposedAV)) {
+                alert("Please enter valid numeric values for Annual Valuations and ensure Mother Holding AV is a positive number.");
                 return;
             }
-            if (proposedAV < 0 || propertyTax < 0 || howrahBridgeTax < 0 || surcharge < 0 || interest < 0 || penalty < 0) {
-                alert("Tax amounts and Proposed Holding AV cannot be negative. Please enter valid amounts.");
+            if (proposedAV < 0 || propertyTax < 0 || howrahBridgeTax < 0 || surcharge < 0 || penalty < 0) {
+                alert("Property Tax, Howrah Bridge Tax, Surcharge, Penalty, and Proposed Holding AV cannot be negative. Please enter valid amounts. Interest can be negative for rebate.");
                 return;
             }
-
 
             // --- Core Proportionate Calculation ---
-            const proportionFactor = proposedAV / motherAV;
+            // Proportion factor is based on the proposed AV relative to the mother AV
+            const proportionFactor = (motherAV > 0) ? proposedAV / motherAV : 0;
 
+            // Calculate proportionate principal components (Property Tax, HB Tax, Surcharge)
             const proportionatePropertyTax = Math.ceil(propertyTax * proportionFactor);
             const proportionateHowrahBridgeTax = Math.ceil(howrahBridgeTax * proportionFactor);
             const proportionateSurcharge = Math.ceil(surcharge * proportionFactor);
-            const proportionateInterest = Math.ceil(interest * proportionFactor);
-            const proportionatePenalty = Math.ceil(penalty * proportionFactor);
 
-            const totalProportionateAmount = proportionatePropertyTax + proportionateHowrahBridgeTax + proportionateSurcharge + proportionateInterest + proportionatePenalty;
+            // --- Calculate Combined Proportionate Interest and Penalty ---
+            // The combined interest and penalty are charged on Property Tax + Surcharge
+            const motherChargeableBase = propertyTax + surcharge;
+            const motherTotalInterestPenalty = interest + penalty;
+
+            let combinedProportionateInterestPenalty = 0;
+
+            if (motherChargeableBase > 0) {
+                // Calculate the proportionate base for the new holding
+                const proportionateChargeableBase = proportionatePropertyTax + proportionateSurcharge;
+
+                // Apply the ratio of mother's total I&P to its base, to the proportionate base
+                combinedProportionateInterestPenalty = Math.ceil((motherTotalInterestPenalty / motherChargeableBase) * proportionateChargeableBase);
+            } else if (motherTotalInterestPenalty !== 0) {
+                 // This scenario means there's original interest/penalty but no base (PT+Surcharge = 0)
+                 // According to the rule "charged on ptax + surcharge combined amount", if the base is 0,
+                 // the proportionate interest/penalty should also be 0.
+                 combinedProportionateInterestPenalty = 0;
+                 console.warn("Mother Property Tax + Surcharge base is 0, but Interest/Penalty exists. Proportionate Interest/Penalty will be 0 as per rule.");
+            }
+            // If both motherChargeableBase and motherTotalInterestPenalty are 0, combinedProportionateInterestPenalty remains 0, which is correct.
+
+
+            // Total proportionate amount is the sum of all proportionate components
+            const totalProportionateAmount = proportionatePropertyTax + proportionateHowrahBridgeTax + proportionateSurcharge + combinedProportionateInterestPenalty;
 
             const formattedTotal = totalProportionateAmount.toFixed(0);
             const words = convertNumberToWords(totalProportionateAmount);
@@ -538,7 +591,7 @@
                 console.error("Error formatting date:", e);
             }
 
-            // --- Populate the Demand Letter Section (unchanged) ---
+            // --- Populate the Demand Letter Section ---
             document.getElementById("out-app3").textContent = appNo;
             document.getElementById("out-app4").textContent = appNo;
             document.getElementById("out-title").textContent = name;
@@ -551,12 +604,18 @@
             document.getElementById("street-demand").textContent = streetName;
             document.getElementById("ward-demand").textContent = wardNumber;
 
-            // Individual proportionate values for demand letter (using toFixed(2) as originally specified)
+            // Individual proportionate values for demand letter
             document.getElementById("demand-prop-tax").textContent = proportionatePropertyTax.toFixed(2);
             document.getElementById("demand-prop-hbt").textContent = proportionateHowrahBridgeTax.toFixed(2);
             document.getElementById("demand-prop-surcharge").textContent = proportionateSurcharge.toFixed(2);
-            document.getElementById("demand-prop-interest").textContent = proportionateInterest.toFixed(2);
-            document.getElementById("demand-prop-penalty").textContent = proportionatePenalty.toFixed(2);
+
+            // Dynamic text for Combined Interest/Rebate & Penalty in Demand Letter
+            const interestPenaltyLine = document.getElementById("demand-interest-penalty-line");
+            if (combinedProportionateInterestPenalty < 0) {
+                interestPenaltyLine.innerHTML = `<li>Rebate (Interest & Penalty): ₹${Math.abs(combinedProportionateInterestPenalty).toFixed(2)}</li>`;
+            } else {
+                interestPenaltyLine.innerHTML = `<li>Interest & Penalty: ₹${combinedProportionateInterestPenalty.toFixed(2)}</li>`;
+            }
 
             document.getElementById("out-calc2").textContent = formattedTotal;
             document.getElementById("out-calc-words").textContent = words;
@@ -566,8 +625,7 @@
             document.getElementById("summary-prop-property-tax").textContent = proportionatePropertyTax.toFixed(0);
             document.getElementById("summary-prop-hbt").textContent = proportionateHowrahBridgeTax.toFixed(0);
             document.getElementById("summary-prop-surcharge").textContent = proportionateSurcharge.toFixed(0);
-            document.getElementById("summary-prop-interest").textContent = proportionateInterest.toFixed(0);
-            document.getElementById("summary-prop-penalty").textContent = proportionatePenalty.toFixed(0);
+            document.getElementById("summary-prop-interest-penalty").textContent = combinedProportionateInterestPenalty.toFixed(0);
             document.getElementById("summary-total-calc").textContent = formattedTotal;
 
             // Display results sections
@@ -584,6 +642,13 @@
             ];
             const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
 
+            // Handle negative numbers for word conversion
+            let isNegative = false;
+            if (n < 0) {
+                isNegative = true;
+                n = Math.abs(n);
+            }
+
             if ((n = n.toString()).length > 9) return "Overflow";
             let num = ("000000000" + n).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
             if (!num) return; let str = "";
@@ -592,7 +657,8 @@
             str += (num[3] != 0) ? (a[Number(num[3])] || b[num[3][0]] + " " + a[num[3][1]]) + " Thousand " : "";
             str += (num[4] != 0) ? (a[Number(num[4])] || b[num[4][0]] + " " + a[num[4][1]]) + " Hundred " : "";
             str += (num[5] != 0) ? ((str !== "") ? "and " : "") + (a[Number(num[5])] || b[num[5][0]] + " " + a[num[5][1]]) + " " : "";
-            return str.trim();
+
+            return (isNegative ? "Minus " : "") + str.trim();
         }
     </script>
 </body>
